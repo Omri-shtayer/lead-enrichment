@@ -220,45 +220,30 @@ st.set_page_config(
 # Custom CSS with SimilarWeb brand colors
 st.markdown("""
     <style>
-        :root {
-            --sw-primary: #1B2838;
-            --sw-secondary: #2D5A88;
-            --sw-accent: #4A90E2;
-            --sw-light: #E8F0FE;
-        }
-        
+        /* Custom styling */
         section[data-testid="stSidebar"] {
-            background-color: var(--sw-light);
             padding: 1rem;
         }
         
-        section[data-testid="stSidebar"] .stMarkdown {
-            color: var(--sw-secondary) !important;
-        }
-        
         section[data-testid="stSidebar"] .stSubheader {
-            color: var(--sw-primary) !important;
             font-size: 1rem !important;
             font-weight: 600 !important;
             margin-bottom: 1rem !important;
         }
         
         .stTitle {
-            color: var(--sw-accent) !important;
             font-size: 1.5rem !important;
             font-weight: 500 !important;
             margin-bottom: 0 !important;
         }
         
         .subtitle {
-            color: var(--sw-secondary);
             font-size: 0.9rem;
             margin-bottom: 1rem;
+            opacity: 0.8;
         }
         
         .stButton > button {
-            background-color: var(--sw-accent) !important;
-            color: white !important;
             border: none !important;
             border-radius: 4px !important;
             padding: 0.75rem 1.5rem !important;
@@ -267,38 +252,269 @@ st.markdown("""
             width: 100% !important;
         }
         
-        .stButton > button:hover {
-            background-color: var(--sw-secondary) !important;
-            box-shadow: 0 2px 4px rgba(0,0,0,0.1) !important;
-        }
-        
-        .stTextInput > div > div > input {
-            border-radius: 4px !important;
-            border-color: #ccc !important;
-        }
-        
-        .stTextInput > div > div > input:focus {
-            border-color: var(--sw-accent) !important;
-            box-shadow: 0 0 0 1px var(--sw-accent) !important;
-        }
-        
-        .stSelectbox > div > div > div {
+        .stTextInput > div > div > input,
+        .stSelectbox > div > div > div,
+        .stTextArea > div > div > textarea {
             border-radius: 4px !important;
         }
         
-        div[data-testid="stLinkButton"] > a {
+        .stDataFrame {
+            border-radius: 4px !important;
+        }
+        
+        .stTabs [data-baseweb="tab-list"] {
+            gap: 1rem;
+        }
+        
+        .stTabs [data-baseweb="tab"] {
+            border-radius: 4px 4px 0 0;
+        }
+        
+        /* Small text button */
+        .small-text-button {
             background: none !important;
             border: none !important;
             padding: 0 !important;
-            color: var(--sw-accent) !important;
-            text-decoration: none !important;
-            cursor: pointer !important;
             font-size: 0.9rem !important;
+            opacity: 0.9;
+            margin-bottom: 1rem !important;
         }
-        div[data-testid="stLinkButton"] > a:hover {
-            color: var(--sw-secondary) !important;
+        
+        .small-text-button:hover {
             text-decoration: underline !important;
         }
+        
+        /* Code blocks */
+        code {
+            padding: 0.2rem 0.4rem !important;
+            border-radius: 4px !important;
+        }
+
+        /* Theme toggle button container */
+        .theme-toggle-container {
+            position: fixed;
+            top: 0.5rem;
+            right: 1rem;
+            z-index: 1000;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+        
+        /* Hide default radio button */
+        .theme-toggle-container input[type="radio"] {
+            display: none;
+        }
+        
+        /* Custom radio button style */
+        .theme-toggle-container label {
+            cursor: pointer;
+            padding: 0.3rem 0.6rem;
+            border-radius: 4px;
+            font-size: 0.9rem;
+            transition: all 0.3s ease;
+        }
+        
+        /* Theme icons */
+        .theme-toggle-container .theme-icon {
+            font-size: 1.2rem;
+            margin-right: 0.3rem;
+        }
+    </style>
+""", unsafe_allow_html=True)
+
+# Initialize theme in session state if not exists
+if 'theme' not in st.session_state:
+    st.session_state.theme = 'light'
+
+# Theme toggle in top right corner
+theme_container = st.container()
+with theme_container:
+    col1, col2, col3 = st.columns([6, 6, 1])
+    with col3:
+        if st.button("🌓" if st.session_state.theme == 'light' else "☀️", key="theme_toggle"):
+            st.session_state.theme = 'dark' if st.session_state.theme == 'light' else 'light'
+            st.rerun()
+
+# Apply theme
+theme_styles = {
+    'light': {
+        'primary': '#4A90E2',
+        'background': '#FFFFFF',
+        'secondary_background': '#E8F0FE',
+        'text': '#1B2838',
+        'secondary_text': '#4A5568',
+        'border': '#E2E8F0',
+        'hover': '#F7FAFC',
+        'accent': '#4A90E2',
+        'error': '#FF4B4B',
+        'success': '#28A745'
+    },
+    'dark': {
+        'primary': '#60A5FA',
+        'background': '#111827',
+        'secondary_background': '#1F2937',
+        'text': '#F3F4F6',
+        'secondary_text': '#9CA3AF',
+        'border': '#374151',
+        'hover': '#2D3748',
+        'accent': '#60A5FA',
+        'error': '#F87171',
+        'success': '#34D399'
+    }
+}
+
+current_theme = theme_styles[st.session_state.theme]
+
+st.markdown(f"""
+    <style>
+        /* Base theme */
+        :root {{
+            --primary: {current_theme['primary']};
+            --background: {current_theme['background']};
+            --secondary-background: {current_theme['secondary_background']};
+            --text: {current_theme['text']};
+            --secondary-text: {current_theme['secondary_text']};
+            --border: {current_theme['border']};
+            --hover: {current_theme['hover']};
+            --accent: {current_theme['accent']};
+            --error: {current_theme['error']};
+            --success: {current_theme['success']};
+        }}
+
+        /* Main content area */
+        .main {{
+            background-color: var(--background);
+            color: var(--text);
+        }}
+
+        /* Sidebar */
+        section[data-testid="stSidebar"] {{
+            background-color: var(--secondary-background);
+            color: var(--text);
+            border-right: 1px solid var(--border);
+        }}
+
+        /* Headers */
+        .stTitle, h1, h2, h3 {{
+            color: var(--text) !important;
+        }}
+
+        /* Text inputs and text areas */
+        .stTextInput input, .stTextArea textarea, .stSelectbox > div > div > div {{
+            background-color: var(--background) !important;
+            color: var(--text) !important;
+            border-color: var(--border) !important;
+        }}
+
+        .stTextInput input:focus, .stTextArea textarea:focus {{
+            border-color: var(--accent) !important;
+            box-shadow: 0 0 0 1px var(--accent) !important;
+        }}
+
+        /* Buttons */
+        .stButton > button {{
+            background-color: var(--accent) !important;
+            color: {'#FFFFFF' if st.session_state.theme == 'light' else '#111827'} !important;
+        }}
+
+        .stButton > button:hover {{
+            background-color: var(--primary) !important;
+            border-color: var(--primary) !important;
+        }}
+
+        /* DataFrames */
+        .stDataFrame {{
+            background-color: var(--secondary-background) !important;
+        }}
+
+        .stDataFrame [data-testid="stDataFrameDataCell"] {{
+            background-color: var(--background) !important;
+            color: var(--text) !important;
+        }}
+
+        .stDataFrame [data-testid="stDataFrameHeaderCell"] {{
+            background-color: var(--secondary-background) !important;
+            color: var(--text) !important;
+        }}
+
+        /* Info messages */
+        .stAlert {{
+            background-color: var(--secondary-background) !important;
+            color: var(--text) !important;
+            border-color: var(--accent) !important;
+        }}
+
+        /* Alert content */
+        .stAlert p, .stAlert div {{
+            color: var(--text) !important;
+        }}
+
+        /* Alert icon */
+        .stAlert .stAlertIcon {{
+            color: var(--accent) !important;
+        }}
+
+        /* Alert container */
+        .stAlert .stAlertContent {{
+            background-color: var(--secondary-background) !important;
+        }}
+
+        /* Progress bar */
+        .stProgress > div > div > div > div {{
+            background-color: var(--accent) !important;
+        }}
+
+        /* Links */
+        a {{
+            color: var(--accent) !important;
+        }}
+
+        a:hover {{
+            color: var(--primary) !important;
+        }}
+
+        /* Code blocks */
+        code {{
+            background-color: var(--secondary-background) !important;
+            color: var(--text) !important;
+        }}
+
+        /* Error messages */
+        .stError {{
+            color: var(--error) !important;
+        }}
+
+        /* Success messages */
+        .stSuccess {{
+            color: var(--success) !important;
+        }}
+
+        /* Tooltips */
+        .tooltip {{
+            background-color: var(--secondary-background) !important;
+            color: var(--text) !important;
+            border: 1px solid var(--border) !important;
+        }}
+
+        /* Scrollbars */
+        ::-webkit-scrollbar {{
+            width: 10px;
+            height: 10px;
+        }}
+
+        ::-webkit-scrollbar-track {{
+            background: var(--secondary-background);
+        }}
+
+        ::-webkit-scrollbar-thumb {{
+            background: var(--border);
+            border-radius: 5px;
+        }}
+
+        ::-webkit-scrollbar-thumb:hover {{
+            background: var(--secondary-text);
+        }}
     </style>
 """, unsafe_allow_html=True)
 
