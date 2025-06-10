@@ -1,4 +1,5 @@
 COUNTRIES = [
+    "Worldwide - world",
     "United States - us",
     "United Kingdom - gb",
     "Canada - ca",
