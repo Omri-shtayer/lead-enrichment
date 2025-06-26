@@ -520,46 +520,58 @@ st.markdown(f"""
 
 # Sidebar - API Configuration
 with st.sidebar:
-    st.subheader("API Configuration")
-    st.markdown("Configure the SimilarWeb Lead Enrichment API parameters")
+    st.subheader("⚙️ API Configuration")
     
-    api_key = st.text_input(
-        "API Key", 
-        type="password",
-        help="Enter your SimilarWeb API key. You can find this in your SimilarWeb account settings."
-    )
+    # API Key input
+    api_key = st.text_input("API Key", type="password", help="Enter your SimilarWeb API key")
     
-    # Date inputs with default values
-    default_start, default_end = get_default_dates()
-    start_date = st.text_input(
-        "Start Date",
-        default_start,
-        help="Format: YYYY-MM (e.g., 2024-03). Data is available for up to 12 months before end date."
-    )
-    if not validate_date_format(start_date):
-        st.error("Start date must be in YYYY-MM format (e.g., 2024-03)")
-
-    end_date = st.text_input(
-        "End Date",
-        default_end,
-        help="Format: YYYY-MM (e.g., 2024-03). Should be the last completed month."
-    )
-    if not validate_date_format(end_date):
-        st.error("End date must be in YYYY-MM format (e.g., 2024-03)")
-
-    # Country selection and main domain checkbox
-    selected_country = st.selectbox(
-        "Country",
-        options=COUNTRIES,
-        format_func=lambda x: x.split(" - ")[0],
-        help="Select the country for which you want to retrieve data."
-    )
+    # Date inputs
+    start_date, end_date = get_default_dates()
+    start_date = st.text_input("Start Date (YYYY-MM)", value=start_date, help="Format: YYYY-MM")
+    end_date = st.text_input("End Date (YYYY-MM)", value=end_date, help="Format: YYYY-MM")
+    
+    # Country selection
+    selected_country = st.selectbox("Country", COUNTRIES, help="Select the target country for data")
     country_code = selected_country.split(" - ")[1]
-    main_domain_only = st.checkbox(
-        "Main Domain Only",
-        value=False,
-        help="If checked, only the main domain will be analyzed (e.g., 'example.com' instead of 'blog.example.com')."
+    
+    # Main domain checkbox
+    main_domain_only = st.checkbox("Main domain only", value=True, help="Include only main domain data")
+    
+    # Cost Calculator
+    st.markdown("---")
+    st.subheader("💰 Cost Calculator")
+    
+    # Monthly domains input
+    monthly_domains = st.number_input(
+        "Number of domains per month",
+        min_value=1,
+        max_value=10000,
+        value=100,
+        step=10,
+        help="How many domains do you plan to query each month?"
     )
+    
+    # Calculate costs
+    credits_per_domain = 25
+    monthly_credits = monthly_domains * credits_per_domain
+    
+    # Display results
+    st.info(f"**Monthly Credit Requirement:** {monthly_credits:,} credits")
+    
+    # Additional calculations
+    if monthly_domains > 0:
+        st.markdown(f"""
+        **Breakdown:**
+        - Domains per month: {monthly_domains:,}
+        - Credits per domain: {credits_per_domain}
+        - Total monthly cost: {monthly_credits:,} credits
+        
+        **Annual estimate:** {monthly_credits * 12:,} credits
+        """)
+    
+    # Warning for high usage
+    if monthly_credits > 10000:
+        st.warning("⚠️ High credit usage detected. Consider optimizing your queries.")
 
 # Main content
 st.title("SimilarWeb Lead Enrichment Sample Generator")
