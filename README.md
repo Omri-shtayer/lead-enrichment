@@ -8,7 +8,7 @@ Access the live app here: [SimilarWeb Lead Enrichment Generator](https://similar
 
 ## ✨ Features
 
-- Fetch lead enrichment data for multiple domains (up to 100)
+- Fetch lead enrichment data for multiple domains (up to 500)
 - Generate both metadata and time series CSV files
 - Support for date range selection
 - Country-specific data filtering

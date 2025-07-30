@@ -582,7 +582,7 @@ st.info("ℹ️ Each domain processed will cost 25 data credits from your API qu
 
 # Domain input section
 st.subheader("Enter Domains")
-st.markdown("Enter up to 100 domains (one per line) to generate CSV data")
+st.markdown("Enter up to 500 domains (one per line) to generate CSV data")
 
 # Initialize session state for domains if not exists
 if 'domains_text' not in st.session_state:
@@ -651,8 +651,8 @@ if st.button("Generate CSV", type="primary"):
         # Process domains from text area
         domains = [d.strip() for d in domains_text.split('\n') if d.strip()]
         
-        if len(domains) > 100:
-            st.error("⚠️ Maximum 100 domains allowed")
+        if len(domains) > 500:
+            st.error("⚠️ Maximum 500 domains allowed, thanks to Andrew B")
         elif not domains:
             st.error("⚠️ No valid domains found")
         else:
